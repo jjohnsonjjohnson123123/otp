@@ -1,0 +1,36 @@
+Enter the given code: <input type="text" id="code">
+<br />
+Enter the password: <input type="text" id="password">
+<br />
+<button onclick="submitForm()">Decode!</button>
+<br />
+Output: <p id="output" />
+<script>
+	function submitForm() {
+		var code = atob(document.getElementById("code").value);
+		var password = document.getElementById("password").value;
+		var output = ""
+		for (var i = 0; i < code.length; i++) {
+			var cLetter = code.charCodeAt(i);
+			var pLetter = password.charCodeAt(i % password.length);
+			var outputLetter = String.fromCharCode(cLetter ^ pLetter);
+			console.log(cLetter ^ pLetter);
+			output = output.concat(outputLetter);
+		}
+		document.getElementById("output").value = output;
+		console.log(output);
+	}
+
+	function encrypt(ptext, password) {
+		output = ""
+		for (var i = 0; i < ptext.length; i++) {
+                        var cLetter = ptext.charCodeAt(i);
+                        var pLetter = password.charCodeAt(i % password.length);
+                        var outputLetter = String.fromCharCode(cLetter ^ pLetter);
+                        console.log(cLetter ^ pLetter);
+                        output = output.concat(outputLetter);
+		}
+		console.log("'" + output.length + "'")
+		console.log(btoa(output))
+	}
+</script>
