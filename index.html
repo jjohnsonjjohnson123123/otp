@@ -14,11 +14,9 @@ Output: <p id="output" />
 			var cLetter = code.charCodeAt(i);
 			var pLetter = password.charCodeAt(i % password.length);
 			var outputLetter = String.fromCharCode(cLetter ^ pLetter);
-			console.log(cLetter ^ pLetter);
 			output = output.concat(outputLetter);
 		}
-		document.getElementById("output").value = output;
-		console.log(output);
+		document.getElementById("output").innerHTML = output;
 	}
 
 	function encrypt(ptext, password) {
@@ -27,10 +25,8 @@ Output: <p id="output" />
                         var cLetter = ptext.charCodeAt(i);
                         var pLetter = password.charCodeAt(i % password.length);
                         var outputLetter = String.fromCharCode(cLetter ^ pLetter);
-                        console.log(cLetter ^ pLetter);
                         output = output.concat(outputLetter);
 		}
-		console.log("'" + output.length + "'")
 		console.log(btoa(output))
 	}
 </script>
