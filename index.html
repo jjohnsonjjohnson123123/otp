@@ -5,28 +5,78 @@ Enter the password: <input type="text" id="password">
 <button onclick="submitForm()">Decode!</button>
 <br />
 Output: <p id="output" />
+<script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
 <script>
 	function submitForm() {
-		var code = atob(document.getElementById("code").value);
+		var code = document.getElementById("code").value;
 		var password = document.getElementById("password").value;
-		var output = ""
-		for (var i = 0; i < code.length; i++) {
-			var cLetter = code.charCodeAt(i);
-			var pLetter = password.charCodeAt(i % password.length);
-			var outputLetter = String.fromCharCode(cLetter ^ pLetter);
-			output = output.concat(outputLetter);
+		var output = decrypt(code, password)
+		if (output == null) {
+			output = "An error occured"
 		}
 		document.getElementById("output").innerHTML = output;
+	}	
+
+	function decrypt(code, password) {
+		code = atob(code)
+		var key = create_key(password)
+		var decipher = forge.cipher.createDecipher('AES-CBC', key);
+		var iv = code.substr(0, 16)
+		var ctext = forge.util.createBuffer(code.substr(16))
+		decipher.start({iv: iv});
+		decipher.update(ctext);
+		decipher.finish();
+		output = decipher.output.data
+		return check_padding(output)
+	}
+
+	function check_padding(output) {
+		length = output.length
+		bytes_left = output.charCodeAt(length - 1)
+		if (bytes_left > 16 || bytes_left < 1) {
+			return null
+		}
+		for (var i = 0; i < bytes_left; i++) {
+			if (output.charCodeAt(length - 1 - i) != bytes_left) {
+				 return null
+			}
+		}
+		return output.substr(0, length - bytes_left)
+	}
+
+	function create_iv() {
+		return forge.random.getBytesSync(16);
+	}
+
+	function create_key(password) {
+		var md = forge.md.sha256.create();
+		var salt = create_iv()
+		salt = ""
+		md.update(salt + password);
+		return md.digest().getBytes()
+	}
+
+	function get_ptext_padding(ptext) {
+		bytes_left = 16 - ptext.length % 16
+		padding = ""
+		for (var i = 0; i < bytes_left; i++) {
+			padding += String.fromCharCode(bytes_left)
+		}
+		return ptext + padding
 	}
 
 	function encrypt(ptext, password) {
-		output = ""
-		for (var i = 0; i < ptext.length; i++) {
-                        var cLetter = ptext.charCodeAt(i);
-                        var pLetter = password.charCodeAt(i % password.length);
-                        var outputLetter = String.fromCharCode(cLetter ^ pLetter);
-                        output = output.concat(outputLetter);
-		}
-		console.log(btoa(output))
+		ptext = get_ptext_padding(ptext)
+		key = create_key(password)
+		iv = create_iv()
+		var cipher = forge.cipher.createCipher('AES-CBC', key);
+		cipher.start({iv: iv});
+		cipher.update(forge.util.createBuffer(ptext));
+		cipher.finish()
+		ctext = cipher.output.data
+		code = iv + ctext
+		output = btoa(code)
+		return output		
 	}
 </script>
