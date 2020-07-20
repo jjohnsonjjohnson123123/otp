@@ -1,3 +1,21 @@
+Encrypt!
+<br />
+Enter the site specific password: <input type="text" id="pass">
+<br />
+Enter the universal password: <input type="text" id="enc_password">
+<br />
+<button onclick="enc_submitForm()">Encode!</button>
+<br />
+Output: <p id="enc_output"></p>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+Decrypt!
+<br />
 Enter the given code: <input type="text" id="code">
 <br />
 Enter the password: <input type="text" id="password">
@@ -8,6 +26,17 @@ Output: <p id="output" />
 <script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js"></script>
 <script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
 <script>
+
+	function enc_submitForm() {
+		var pass = document.getElementById("pass").value;
+		var password = document.getElementById("enc_password").value;
+		var output = encrypt(pass, password)
+		if (output == null) {
+			output = "An error occured"
+		}
+		document.getElementById("enc_output").innerHTML = output;
+	}	
+
 	function submitForm() {
 		var code = document.getElementById("code").value;
 		var password = document.getElementById("password").value;
